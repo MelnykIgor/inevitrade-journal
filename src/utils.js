@@ -162,3 +162,10 @@ export function pairBreakdown(trades) {
     }))
     .sort((a, b) => b.net - a.net)
 }
+
+export function todayStats(trades) {
+  const todayKey = new Date().toISOString().slice(0, 10)
+  const todayTrades = trades.filter((t) => t.date === todayKey)
+  const net = todayTrades.reduce((a, t) => a + netPnl(t), 0)
+  return { net, count: todayTrades.length }
+}

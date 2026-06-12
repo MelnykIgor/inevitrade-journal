@@ -1,7 +1,7 @@
 import React from 'react'
 import { StatCard } from './ui.jsx'
 import OverallStatistics from './OverallStatistics.jsx'
-import { formatMoney, netPnl } from '../utils.js'
+import { formatMoney, netPnl, todayStats } from '../utils.js'
 
 const resultStyles = {
   Win: 'bg-win/10 text-win border border-win/30',
@@ -36,8 +36,6 @@ export default function DashboardPage({
   setEditingBalance,
   startBalanceInput,
   setStartBalanceInput,
-  filters,
-  setFilters,
 }) {
   return (
     <div className="space-y-8">
@@ -79,8 +77,20 @@ export default function DashboardPage({
       </div>
 
       {/* Top stats */}
-      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
-        <StatCard label="Trades" value={stats.total} accent />
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-9 gap-3">
+        {(() => {
+          const today = todayStats(allTrades)
+          return (
+            <StatCard
+              label="Today's P&L"
+              value={today.count > 0 ? formatMoney(today.net) : '—'}
+              sub={today.count > 0 ? `${today.count} trade${today.count > 1 ? 's' : ''}` : 'no trades yet'}
+              valueClass={today.net > 0 ? 'text-win' : today.net < 0 ? 'text-loss' : ''}
+              accent
+            />
+          )
+        })()}
+        <StatCard label="Trades" value={stats.total} />
         <StatCard
           label="Win rate"
           value={stats.total > 0 ? `${stats.winRate.toFixed(1)}%` : '—'}
@@ -277,66 +287,6 @@ export default function DashboardPage({
           </form>
         </section>
       )}
-
-      {/* Filters */}
-      <section className="bg-surface backdrop-blur-sm border border-border rounded-xl p-3 sm:p-4 flex flex-wrap items-end gap-3">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">Result</label>
-          <select
-            value={filters.result}
-            onChange={(e) => setFilters((f) => ({ ...f, result: e.target.value }))}
-            className="bg-surface2 border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-accent"
-          >
-            <option>All</option>
-            <option>Win</option>
-            <option>Loss</option>
-            <option>BE</option>
-          </select>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">Direction</label>
-          <select
-            value={filters.position}
-            onChange={(e) => setFilters((f) => ({ ...f, position: e.target.value }))}
-            className="bg-surface2 border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-accent"
-          >
-            <option>All</option>
-            <option>Long</option>
-            <option>Short</option>
-          </select>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">From</label>
-          <input
-            type="date"
-            lang="en-US"
-            value={filters.from}
-            onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
-            className="bg-surface2 border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-accent"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">To</label>
-          <input
-            type="date"
-            lang="en-US"
-            value={filters.to}
-            onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
-            className="bg-surface2 border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-accent"
-          />
-        </div>
-        {(filters.result !== 'All' || filters.position !== 'All' || filters.from || filters.to) && (
-          <button
-            onClick={() => setFilters({ result: 'All', position: 'All', from: '', to: '' })}
-            className="text-xs font-medium text-accent3 border border-accent/30 bg-accent/5 rounded-lg px-3 py-1.5 hover:bg-accent/15 transition-all hover:scale-[1.05]"
-          >
-            Clear filters
-          </button>
-        )}
-        <span className="text-xs text-gray-500 ml-auto">
-          {trades.length} of {allTrades.length} trades
-        </span>
-      </section>
 
       {/* Trade table */}
       <section className="bg-surface backdrop-blur-sm border border-border rounded-xl overflow-hidden">

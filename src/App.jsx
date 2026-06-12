@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import DashboardPage from './components/DashboardPage.jsx'
 import CalendarPage from './components/CalendarPage.jsx'
+import LoginPage from './components/LoginPage.jsx'
 import { computeStats, buildBalanceSeries, netPnl } from './utils.js'
 import { supabase } from './supabase.js'
 
@@ -34,10 +35,20 @@ export default function App() {
   const [form, setForm] = useState(emptyTrade)
   const [editingId, setEditingId] = useState(null)
 
+  const [session, setSession] = useState(undefined) // undefined = loading, null = signed out
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+    })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession)
+    })
+    return () => listener.subscription.unsubscribe()
+  }, [])
+
   const [startBalanceInput, setStartBalanceInput] = useState('259')
   const [editingBalance, setEditingBalance] = useState(false)
-
-  const [filters, setFilters] = useState({ result: 'All', position: 'All', from: '', to: '' })
 
   useEffect(() => {
     function handleScroll() {
@@ -49,6 +60,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+  if (!session) return
   async function loadData() {
     const { data: tradesData, error: tradesError } =
       await supabase
@@ -73,7 +85,7 @@ export default function App() {
   }
 
   loadData()
-}, [])
+}, [session])
 
   const startBalance = Number(startBalanceInput) || 0
 
@@ -177,15 +189,17 @@ export default function App() {
     return map
   }, [trades, startBalance])
 
-  const filteredTrades = useMemo(() => {
-    return trades.filter((t) => {
-      if (filters.result !== 'All' && t.result !== filters.result) return false
-      if (filters.position !== 'All' && t.position !== filters.position) return false
-      if (filters.from && t.date < filters.from) return false
-      if (filters.to && t.date > filters.to) return false
-      return true
-    })
-  }, [trades, filters])
+  if (session === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg text-gray-400 text-sm">
+        Loading...
+      </div>
+    )
+  }
+
+  if (!session) {
+    return <LoginPage />
+  }
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row text-gray-100">
@@ -202,7 +216,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto">
         {page === 'dashboard' && (
           <DashboardPage
-            trades={filteredTrades}
+            trades={trades}
             allTrades={trades}
             stats={stats}
             balanceSeries={balanceSeries}
@@ -222,8 +236,6 @@ export default function App() {
             setEditingBalance={setEditingBalance}
             startBalanceInput={startBalanceInput}
             setStartBalanceInput={setStartBalanceInput}
-            filters={filters}
-            setFilters={setFilters}
           />
         )}
         {page === 'calendar' && <CalendarPage trades={trades} />}

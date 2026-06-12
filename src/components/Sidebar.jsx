@@ -1,5 +1,6 @@
 import React from 'react'
 import Logo from './Logo.jsx'
+import { supabase } from '../supabase.js'
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
@@ -94,6 +95,19 @@ export default function Sidebar({ page, onNavigate }) {
           )
         })}
       </nav>
+      {/* Sign out - fixed circular button, top-right */}
+      <button
+        onClick={() => supabase.auth.signOut()}
+        className="fixed top-3 right-3 sm:top-4 sm:right-4 z-30 w-9 h-9 rounded-full bg-loss/10 border border-loss/30 flex items-center justify-center text-loss hover:bg-loss/20 hover:scale-110 transition-all backdrop-blur-sm"
+        aria-label="Sign out"
+        title="Sign out"
+      >
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 17l5-5-5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M21 12H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
     </>
   )
 }
