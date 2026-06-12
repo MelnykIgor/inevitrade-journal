@@ -135,15 +135,15 @@ export default function CalendarPage({ trades }) {
               <div
                 key={idx}
                 onClick={() => stat && setSelectedDate(key)}
-                className={`rounded-lg border min-h-[60px] sm:min-h-[88px] p-2 flex flex-col gap-1 transition-all ${cellClass} ${
+                className={`rounded-lg border min-h-[60px] sm:min-h-[88px] p-1 sm:p-2 flex flex-col gap-0.5 sm:gap-1 transition-all ${cellClass} ${
                   isToday ? 'ring-1 ring-accent/60' : ''
-                } ${stat ? 'cursor-pointer hover:scale-[1.03] hover:shadow-glow hover:border-accent/50' : ''}`}
+                } ${stat ? 'cursor-pointer hover:scale-[1.03] hover:shadow-glow hover:border-accent/50' : ''} overflow-hidden`}
               >
                 <span className="text-[10px] sm:text-xs text-gray-400">{d}</span>
                 {stat && (
                   <div className="flex flex-col gap-0.5 mt-auto">
                     <span
-                      className={`text-[11px] sm:text-sm font-semibold ${
+                      className={`text-[10px] sm:text-sm font-semibold truncate ${
                         stat.pnl > 0 ? 'text-win' : stat.pnl < 0 ? 'text-loss' : 'text-gray-300'
                       }`}
                     >

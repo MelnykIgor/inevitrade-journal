@@ -53,7 +53,7 @@ export default function DayDetailModal({ date, trades, onClose }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-surface3 backdrop-blur-md border border-accent/30 rounded-2xl shadow-glow p-6 text-center relative animate-[fadeIn_0.15s_ease-out]"
+        className="w-full max-w-md bg-surface3 backdrop-blur-md border border-accent/30 rounded-2xl shadow-glow p-4 sm:p-6 text-center relative animate-[fadeIn_0.15s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -66,7 +66,7 @@ export default function DayDetailModal({ date, trades, onClose }) {
 
         <p className="text-sm text-gray-400">{formatDateLong(date)}</p>
         <p
-          className={`text-4xl font-semibold mt-2 mb-4 ${
+          className={`text-3xl sm:text-4xl font-semibold mt-2 mb-4 break-words ${
             summary.net > 0 ? 'text-win' : summary.net < 0 ? 'text-loss' : 'text-gray-300'
           }`}
         >
@@ -104,7 +104,7 @@ export default function DayDetailModal({ date, trades, onClose }) {
           </div>
         </div>
 
-        <div className="flex justify-center gap-5 text-xs text-gray-400 mb-5">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-5 text-xs text-gray-400 mb-5">
           <span>
             {summary.count} trade{summary.count !== 1 ? 's' : ''}
           </span>

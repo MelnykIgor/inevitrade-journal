@@ -139,19 +139,7 @@ background:
 }
 
 .space-bg .star-layer,
-.space-bg .star-layer-2,
 .space-bg .star-layer-3 {
   transform: translateY(var(--parallax-y, 0px));
   transition: transform 0.05s linear;
-}
-
-.space-bg .star-layer-2 {
-  position: absolute;
-  inset: 0;
-  opacity: .1;
-
-  background-image:
-    radial-gradient(white 1px, transparent 1px);
-
-  background-size: 30px 30px;
 }

@@ -6,9 +6,9 @@ export default {
     extend: {
       colors: {
         bg: '#0a0813',
-        surface: 'rgba(21,16,31,0.7)',
-        surface2: 'rgba(28,21,48,0.7)',
-        surface3: 'rgba(36,27,58,0.7)',
+        surface: 'rgba(21,16,31,0.32)',
+        surface2: 'rgba(28,21,48,0.32)',
+        surface3: 'rgba(36,27,58,0.38)',
         border: '#2c2240',
         accent: '#8b5cf6',
         accent2: '#a78bfa',

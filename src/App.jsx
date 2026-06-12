@@ -195,7 +195,6 @@ export default function App() {
         <div className="nebula nebula-3" />
         <div className="nebula nebula-4" />
         <div className="star-layer" />
-        <div className="star-layer-2" />
         <div className="star-layer-3" />
       </div>
       <Sidebar page={page} onNavigate={setPage} />
