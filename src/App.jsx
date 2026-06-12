@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar.jsx'
 import DashboardPage from './components/DashboardPage.jsx'
 import CalendarPage from './components/CalendarPage.jsx'
 import { computeStats, buildBalanceSeries, netPnl } from './utils.js'
+import { supabase } from './supabase.js'
 
 const TRADES_KEY = 'inevitrade_trades_v2'
 const BALANCE_KEY = 'inevitrade_start_balance_v2'
@@ -22,45 +23,48 @@ const emptyTrade = {
   notes: '',
 }
 
-function loadTrades() {
-  try {
-    const raw = localStorage.getItem(TRADES_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch (e) {}
-  return []
-}
-
-function loadStartBalance() {
-  try {
-    const raw = localStorage.getItem(BALANCE_KEY)
-    if (raw !== null) return raw
-  } catch (e) {}
-  return '10000'
-}
-
 function saveTrades(trades) {
   localStorage.setItem(TRADES_KEY, JSON.stringify(trades))
 }
 
 export default function App() {
   const [page, setPage] = useState('dashboard')
-  const [trades, setTrades] = useState(loadTrades)
+ const [trades, setTrades] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(emptyTrade)
   const [editingId, setEditingId] = useState(null)
 
-  const [startBalanceInput, setStartBalanceInput] = useState(loadStartBalance)
+  const [startBalanceInput, setStartBalanceInput] = useState('259')
   const [editingBalance, setEditingBalance] = useState(false)
 
   const [filters, setFilters] = useState({ search: '', result: 'All', position: 'All', from: '', to: '' })
 
   useEffect(() => {
-    saveTrades(trades)
-  }, [trades])
+  async function loadData() {
+    const { data: tradesData, error: tradesError } =
+      await supabase
+        .from('trades')
+        .select('*')
+        .order('date', { ascending: false })
 
-  useEffect(() => {
-    localStorage.setItem(BALANCE_KEY, startBalanceInput)
-  }, [startBalanceInput])
+    if (!tradesError && tradesData) {
+      setTrades(tradesData)
+    }
+
+    const { data: settingsData } =
+      await supabase
+        .from('settings')
+        .select('*')
+        .eq('id', 1)
+        .single()
+
+    if (settingsData) {
+      setStartBalanceInput(String(settingsData.start_balance))
+    }
+  }
+
+  loadData()
+}, [])
 
   const startBalance = Number(startBalanceInput) || 0
 
@@ -73,7 +77,7 @@ export default function App() {
     setForm((f) => ({ ...f, [name]: value }))
   }
 
-  function handleAdd(e) {
+ async function handleAdd(e) {
     e.preventDefault()
     if (!form.pair.trim()) return
     const payload = {
@@ -86,12 +90,33 @@ export default function App() {
         ? String(form.leverage).replace(/x$/i, '') + 'x'
         : '',
     }
-    if (editingId !== null) {
-      setTrades((prev) => prev.map((t) => (t.id === editingId ? { ...payload, id: editingId } : t)))
-      setEditingId(null)
-    } else {
-      setTrades((prev) => [{ ...payload, id: Date.now() }, ...prev])
-    }
+  if (editingId !== null) {
+  const { error } = await supabase
+    .from('trades')
+    .update(payload)
+    .eq('id', editingId)
+
+  if (!error) {
+    setTrades((prev) =>
+      prev.map((t) => (t.id === editingId ? { ...payload, id: editingId } : t))
+    )
+  }
+
+  setEditingId(null)
+} else {
+  const newTrade = {
+    ...payload,
+    id: Date.now(),
+  }
+
+  const { error } = await supabase
+    .from('trades')
+    .insert([newTrade])
+
+  if (!error) {
+    setTrades((prev) => [newTrade, ...prev])
+  }
+}
     setForm(emptyTrade)
     setShowForm(false)
   }
@@ -115,10 +140,18 @@ export default function App() {
     setShowForm(false)
   }
 
-  function handleDelete(id) {
+ async function handleDelete(id) {
+  const { error } = await supabase
+    .from('trades')
+    .delete()
+    .eq('id', id)
+
+  if (!error) {
     setTrades((prev) => prev.filter((t) => t.id !== id))
-    if (editingId === id) handleCancelForm()
   }
+
+  if (editingId === id) handleCancelForm()
+}
 
   // running balance per row, computed from chronological order
   const balanceByTradeId = useMemo(() => {
