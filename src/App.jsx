@@ -37,7 +37,16 @@ export default function App() {
   const [startBalanceInput, setStartBalanceInput] = useState('259')
   const [editingBalance, setEditingBalance] = useState(false)
 
-  const [filters, setFilters] = useState({ search: '', result: 'All', position: 'All', from: '', to: '' })
+  const [filters, setFilters] = useState({ result: 'All', position: 'All', from: '', to: '' })
+
+  useEffect(() => {
+    function handleScroll() {
+      const y = window.scrollY * 0.08
+      document.documentElement.style.setProperty('--parallax-y', `${y}px`)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
   async function loadData() {
@@ -170,10 +179,6 @@ export default function App() {
 
   const filteredTrades = useMemo(() => {
     return trades.filter((t) => {
-      if (filters.search) {
-        const q = filters.search.trim().toUpperCase()
-        if (!t.pair.toUpperCase().includes(q)) return false
-      }
       if (filters.result !== 'All' && t.result !== filters.result) return false
       if (filters.position !== 'All' && t.position !== filters.position) return false
       if (filters.from && t.date < filters.from) return false
@@ -183,16 +188,18 @@ export default function App() {
   }, [trades, filters])
 
   return (
-    <div className="min-h-screen flex bg-bg text-gray-100">
+    <div className="min-h-screen flex flex-col sm:flex-row text-gray-100">
       <div className="space-bg">
         <div className="nebula nebula-1" />
         <div className="nebula nebula-2" />
         <div className="nebula nebula-3" />
         <div className="nebula nebula-4" />
         <div className="star-layer" />
+        <div className="star-layer-2" />
+        <div className="star-layer-3" />
       </div>
       <Sidebar page={page} onNavigate={setPage} />
-      <main className="flex-1 px-4 sm:px-6 py-6">
+      <main className="flex-1 px-4 sm:px-6 py-6 pb-20 sm:pb-6">
         <div className="max-w-7xl mx-auto">
         {page === 'dashboard' && (
           <DashboardPage

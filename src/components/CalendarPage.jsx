@@ -106,7 +106,7 @@ export default function CalendarPage({ trades }) {
           </button>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 mb-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
           {WEEKDAYS.map((wd) => (
             <div key={wd} className="text-center text-[11px] uppercase tracking-wide text-gray-500 py-1">
               {wd}
@@ -114,10 +114,10 @@ export default function CalendarPage({ trades }) {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {cells.map((d, idx) => {
             if (d === null) {
-              return <div key={idx} className="rounded-lg border border-transparent min-h-[88px]" />
+              return <div key={idx} className="rounded-lg border border-transparent min-h-[60px] sm:min-h-[88px]" />
             }
             const key = dateKey(year, month, d)
             const stat = dayStats[key]
@@ -135,25 +135,25 @@ export default function CalendarPage({ trades }) {
               <div
                 key={idx}
                 onClick={() => stat && setSelectedDate(key)}
-                className={`rounded-lg border min-h-[88px] p-2 flex flex-col gap-1 transition-all ${cellClass} ${
+                className={`rounded-lg border min-h-[60px] sm:min-h-[88px] p-2 flex flex-col gap-1 transition-all ${cellClass} ${
                   isToday ? 'ring-1 ring-accent/60' : ''
                 } ${stat ? 'cursor-pointer hover:scale-[1.03] hover:shadow-glow hover:border-accent/50' : ''}`}
               >
-                <span className="text-xs text-gray-400">{d}</span>
+                <span className="text-[10px] sm:text-xs text-gray-400">{d}</span>
                 {stat && (
                   <div className="flex flex-col gap-0.5 mt-auto">
                     <span
-                      className={`text-sm font-semibold ${
+                      className={`text-[11px] sm:text-sm font-semibold ${
                         stat.pnl > 0 ? 'text-win' : stat.pnl < 0 ? 'text-loss' : 'text-gray-300'
                       }`}
                     >
                       {formatMoney(stat.pnl)}
                     </span>
-                    <span className="text-[11px] text-gray-500">
+                    <span className="hidden sm:inline text-[11px] text-gray-500">
                       {stat.count} trade{stat.count > 1 ? 's' : ''}
                     </span>
                     {stat.winRate !== null && (
-                      <span className="text-[11px] text-gray-500">{stat.winRate.toFixed(0)}% WR</span>
+                      <span className="hidden sm:inline text-[11px] text-gray-500">{stat.winRate.toFixed(0)}% WR</span>
                     )}
                   </div>
                 )}

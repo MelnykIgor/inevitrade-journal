@@ -41,10 +41,10 @@ export default function DashboardPage({
 }) {
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
+        <div className="flex items-center justify-between sm:justify-end gap-4">
+          <div className="text-left sm:text-right">
             <p className="text-[11px] uppercase tracking-wider text-gray-400">Current balance</p>
             {editingBalance ? (
               <div className="flex items-center gap-1">
@@ -281,16 +281,6 @@ export default function DashboardPage({
       {/* Filters */}
       <section className="bg-surface backdrop-blur-sm border border-border rounded-xl p-3 sm:p-4 flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">Search pair</label>
-          <input
-            type="text"
-            value={filters.search}
-            onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-            placeholder="BTCUSD"
-            className="bg-surface2 border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-accent w-32 uppercase"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
           <label className="text-xs text-gray-400">Result</label>
           <select
             value={filters.result}
@@ -335,9 +325,9 @@ export default function DashboardPage({
             className="bg-surface2 border border-border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-accent"
           />
         </div>
-        {(filters.search || filters.result !== 'All' || filters.position !== 'All' || filters.from || filters.to) && (
+        {(filters.result !== 'All' || filters.position !== 'All' || filters.from || filters.to) && (
           <button
-            onClick={() => setFilters({ search: '', result: 'All', position: 'All', from: '', to: '' })}
+            onClick={() => setFilters({ result: 'All', position: 'All', from: '', to: '' })}
             className="text-xs font-medium text-accent3 border border-accent/30 bg-accent/5 rounded-lg px-3 py-1.5 hover:bg-accent/15 transition-all hover:scale-[1.05]"
           >
             Clear filters
